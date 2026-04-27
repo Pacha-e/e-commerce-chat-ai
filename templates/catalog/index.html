@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elite Zapatos | E-commerce Chat IA</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --primary: #6366f1;
+            --secondary: #4f46e5;
+            --dark: #0f172a;
+            --light: #f8fafc;
+            --accent: #f43f5e;
+            --glass: rgba(255,255,255,0.8);
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: #f1f5f9;
+            color: var(--dark);
+            overflow-x: hidden;
+        }
+
+        /* Hero */
+        .hero {
+            background: linear-gradient(135deg, var(--dark) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 100px 0 140px;
+            clip-path: polygon(0 0, 100% 0, 100% 85%, 0% 100%);
+            margin-bottom: -60px;
+        }
+
+        .hero h1 { font-weight: 700; font-size: 3.5rem; margin-bottom: 20px; }
+
+        /* Filter Bar */
+        .filter-bar {
+            background: white;
+            border-radius: 20px;
+            padding: 20px 28px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+            margin-bottom: 32px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .filter-bar .filter-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #94a3b8;
+            margin-bottom: 10px;
+        }
+
+        .filter-pills { display: flex; flex-wrap: wrap; gap: 8px; }
+
+        .filter-pill {
+            background: #f1f5f9;
+            border: 1px solid #e2e8f0;
+            border-radius: 50px;
+            padding: 6px 18px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: 0.2s;
+            color: var(--dark);
+        }
+
+        .filter-pill:hover { background: #e2e8f0; }
+
+        .filter-pill.active {
+            background: var(--dark);
+            color: white;
+            border-color: var(--dark);
+        }
+
+        /* Product Cards */
+        .product-card {
+            border: none;
+            border-radius: 20px;
+            background: white;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            height: 100%;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .product-card:hover { transform: translateY(-10px); box-shadow: 0 20px 35px rgba(0,0,0,0.1); }
+
+        .product-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: var(--primary);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            z-index: 10;
+        }
+
+        .card-img-container {
+            height: 220px;
+            background: #f8fafc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card-img-container i {
+            font-size: 5rem;
+            color: #cbd5e1;
+            transition: 0.3s;
+        }
+
+        .product-card:hover .card-img-container i {
+            transform: scale(1.1) rotate(-10deg);
+            color: var(--primary);
+        }
+
+        .product-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .product-card:hover .product-img { transform: scale(1.08); }
+
+        .card-body { padding: 25px; }
+
+        .price-tag { font-size: 1.5rem; font-weight: 700; color: var(--dark); }
+
+        .btn-buy {
+            background: var(--dark);
+            color: white;
+            border-radius: 12px;
+            padding: 10px 20px;
+            transition: 0.3s;
+            border: none;
+            width: 100%;
+        }
+
+        .btn-buy:hover { background: var(--primary); color: white; }
+
+        /* Scroll Reveal */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+
+        .reveal.visible { opacity: 1; transform: none; }
+
+        /* Chat Widget */
+        #chat-widget { position: fixed; bottom: 30px; right: 30px; z-index: 1000; }
+
+        #chat-toggle {
+            width: 65px;
+            height: 65px;
+            background: var(--dark);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            transition: 0.3s;
+            border: none;
+            position: relative;
+        }
+
+        #chat-toggle:hover { transform: scale(1.1) rotate(5deg); background: var(--primary); }
+
+        #chat-toggle .unread-badge {
+            display: none;
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            width: 14px;
+            height: 14px;
+            background: var(--accent);
+            border-radius: 50%;
+            border: 2px solid white;
+        }
+
+        #chat-toggle .unread-badge.show { display: block; }
+
+        #chat-container {
+            position: absolute;
+            bottom: 80px;
+            right: 0;
+            width: 380px;
+            height: 520px;
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 15px 50px rgba(0,0,0,0.15);
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .chat-header {
+            background: var(--dark);
+            color: white;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .chat-header img { width: 40px; height: 40px; border-radius: 50%; border: 2px solid var(--primary); }
+
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background: #f8fafc;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .message {
+            max-width: 85%;
+            padding: 12px 16px;
+            border-radius: 18px;
+            font-size: 0.95rem;
+            line-height: 1.4;
+        }
+
+        .message.user {
+            align-self: flex-end;
+            background: var(--dark);
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .message.assistant {
+            align-self: flex-start;
+            background: white;
+            color: var(--dark);
+            border-bottom-left-radius: 4px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        /* Typing indicator */
+        .typing-dots {
+            display: flex;
+            gap: 4px;
+            align-items: center;
+            padding: 14px 18px;
+        }
+
+        .typing-dots span {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #94a3b8;
+            animation: bounce 1.2s infinite;
+        }
+
+        .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes bounce {
+            0%,60%,100% { transform: translateY(0); }
+            30% { transform: translateY(-6px); }
+        }
+
+        /* Suggestion chips */
+        .suggestion-chips { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+
+        .suggestion-chips button {
+            background: #f1f5f9;
+            border: 1px solid #e2e8f0;
+            border-radius: 20px;
+            padding: 5px 14px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: 0.2s;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .suggestion-chips button:hover { background: var(--primary); color: white; border-color: var(--primary); }
+
+        .chat-input {
+            padding: 15px;
+            background: white;
+            border-top: 1px solid #eee;
+            display: flex;
+            gap: 10px;
+        }
+
+        .chat-input input {
+            flex: 1;
+            border: none;
+            background: #f1f5f9;
+            padding: 10px 15px;
+            border-radius: 12px;
+            outline: none;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .chat-input button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            transition: 0.3s;
+            cursor: pointer;
+        }
+
+        .chat-input button:hover { background: var(--accent); }
+
+        /* Hidden cards */
+        .product-col.hidden { display: none; }
+    </style>
+</head>
+<body>
+
+    <!-- Hero -->
+    <section class="hero">
+        <div class="container text-center">
+            <h1>Elite Zapatos</h1>
+            <p class="lead">Encuentra el estilo que define tus pasos. Chat inteligente 24/7.</p>
+        </div>
+    </section>
+
+    <!-- Catalog -->
+    <div class="container pb-5">
+
+        <!-- Filter Bar -->
+        <div class="filter-bar mt-5">
+            <div class="row g-3">
+                <div class="col-12 col-md-6">
+                    <div class="filter-label">Marca</div>
+                    <div class="filter-pills" id="brand-filters">
+                        <button class="filter-pill active" data-filter-type="brand" data-value="all">Todos</button>
+                        <button class="filter-pill" data-filter-type="brand" data-value="Nike">Nike</button>
+                        <button class="filter-pill" data-filter-type="brand" data-value="Adidas">Adidas</button>
+                        <button class="filter-pill" data-filter-type="brand" data-value="Puma">Puma</button>
+                        <button class="filter-pill" data-filter-type="brand" data-value="New Balance">New Balance</button>
+                        <button class="filter-pill" data-filter-type="brand" data-value="Reebok">Reebok</button>
+                        <button class="filter-pill" data-filter-type="brand" data-value="Clarks">Clarks</button>
+                    </div>
+                </div>
+                <div class="col-12 col-md-6">
+                    <div class="filter-label">Categoría</div>
+                    <div class="filter-pills" id="category-filters">
+                        <button class="filter-pill active" data-filter-type="category" data-value="all">Todas</button>
+                        <button class="filter-pill" data-filter-type="category" data-value="Running">Running</button>
+                        <button class="filter-pill" data-filter-type="category" data-value="Casual">Casual</button>
+                        <button class="filter-pill" data-filter-type="category" data-value="Formal">Formal</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Product Grid -->
+        <div class="row g-4" id="product-grid">
+            {% for product in products %}
+            <div class="col-md-6 col-lg-3 product-col reveal" style="transition-delay: {{ forloop.counter0 }}00ms"
+                 data-brand="{{ product.brand }}" data-category="{{ product.category }}">
+                <div class="product-card">
+                    <span class="product-badge">{{ product.category }}</span>
+                    <div class="card-img-container">
+                        {% if product.image_url %}
+                        <img src="{{ product.image_url }}" alt="{{ product.name }}" class="product-img"
+                             onerror="this.style.display='none';this.nextElementSibling.style.display=''">
+                        <i class="fas fa-shoe-prints" style="display:none"></i>
+                        {% else %}
+                        <i class="fas fa-shoe-prints"></i>
+                        {% endif %}
+                    </div>
+                    <div class="card-body">
+                        <p class="text-muted mb-1">{{ product.brand }}</p>
+                        <h5 class="card-title mb-3">{{ product.name }}</h5>
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <span class="price-tag">${{ product.price }}</span>
+                            <span class="text-{% if product.stock > 0 %}success{% else %}danger{% endif %} small">
+                                <i class="fas fa-circle me-1"></i> {{ product.stock }} Disp.
+                            </span>
+                        </div>
+                        <button class="btn-buy">Ver Detalle</button>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12 text-center mt-5">
+                <h3>No hay productos disponibles :(</h3>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Chat Widget -->
+    <div id="chat-widget">
+        <div id="chat-container">
+            <div class="chat-header">
+                <div class="position-relative">
+                    <img src="https://ui-avatars.com/api/?name=AI+Assistant&background=6366f1&color=fff" alt="AI">
+                    <span class="position-absolute bottom-0 end-0 bg-success border border-white rounded-circle" style="width:12px;height:12px;"></span>
+                </div>
+                <div>
+                    <h6 class="mb-0">Asistente Elite</h6>
+                    <small class="opacity-75">En línea ahora</small>
+                </div>
+                <button class="ms-auto btn btn-link text-white p-0" onclick="toggleChat()"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="chat-messages" id="chat-messages">
+                <div class="message assistant">
+                    ¡Hola! Soy tu asistente personal de Elite Zapatos. ¿Buscas algo en especial hoy?
+                    <div class="suggestion-chips">
+                        <button onclick="sendChip('Nike para correr')">Nike running</button>
+                        <button onclick="sendChip('Zapatos casuales')">Casuales</button>
+                        <button onclick="sendChip('¿Qué hay en oferta?')">Ofertas</button>
+                    </div>
+                </div>
+            </div>
+            <div class="chat-input">
+                <input type="text" id="userInput" placeholder="Escribe tu mensaje..." onkeypress="handleEnter(event)">
+                <button onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
+            </div>
+        </div>
+        <button id="chat-toggle" onclick="toggleChat()">
+            <i class="fas fa-comment-dots"></i>
+            <span class="unread-badge" id="unread-badge"></span>
+        </button>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        const session_id = "{{ session_id }}";
+        const chatContainer = document.getElementById('chat-container');
+        const chatMessages = document.getElementById('chat-messages');
+        const userInput = document.getElementById('userInput');
+        const unreadBadge = document.getElementById('unread-badge');
+        let chatOpen = false;
+
+        // Scroll reveal
+        const observer = new IntersectionObserver(entries => {
+            entries.forEach(e => {
+                if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); }
+            });
+        }, { threshold: 0.1 });
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+        // Filters
+        let activeFilters = { brand: 'all', category: 'all' };
+
+        document.querySelectorAll('.filter-pill').forEach(pill => {
+            pill.addEventListener('click', () => {
+                const type = pill.dataset.filterType;
+                const value = pill.dataset.value;
+                activeFilters[type] = value;
+
+                pill.closest('.filter-pills').querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+                pill.classList.add('active');
+
+                applyFilters();
+            });
+        });
+
+        function applyFilters() {
+            document.querySelectorAll('.product-col').forEach(col => {
+                const brandMatch = activeFilters.brand === 'all' || col.dataset.brand === activeFilters.brand;
+                const catMatch = activeFilters.category === 'all' || col.dataset.category === activeFilters.category;
+                col.classList.toggle('hidden', !(brandMatch && catMatch));
+            });
+        }
+
+        // Chat
+        function toggleChat() {
+            chatOpen = !chatOpen;
+            chatContainer.style.display = chatOpen ? 'flex' : 'none';
+            if (chatOpen) {
+                unreadBadge.classList.remove('show');
+                userInput.focus();
+                scrollChat();
+            }
+        }
+
+        function handleEnter(e) { if (e.key === 'Enter') sendMessage(); }
+
+        function scrollChat() { chatMessages.scrollTop = chatMessages.scrollHeight; }
+
+        function sendChip(text) { userInput.value = text; sendMessage(); }
+
+        const sendBtn = document.querySelector('.chat-input button');
+
+        async function sendMessage() {
+            const message = userInput.value.trim();
+            if (!message || sendBtn.disabled) return;
+
+            appendMessage('user', message);
+            userInput.value = '';
+            sendBtn.disabled = true;
+
+            const typingId = 'typing-' + Date.now();
+            const typingEl = document.createElement('div');
+            typingEl.className = 'typing-dots message assistant';
+            typingEl.id = typingId;
+            typingEl.innerHTML = '<span></span><span></span><span></span>';
+            chatMessages.appendChild(typingEl);
+            scrollChat();
+
+            try {
+                const response = await fetch('/chat-api/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message, session_id })
+                });
+                const data = await response.json();
+                document.getElementById(typingId)?.remove();
+                appendMessage('assistant', data.assistant_message);
+                const isOpen = chatContainer.style.display === 'flex';
+                if (!isOpen) unreadBadge.classList.add('show');
+            } catch (err) {
+                const el = document.getElementById(typingId);
+                if (el) el.textContent = 'Error al conectar con la IA.';
+            } finally {
+                sendBtn.disabled = false;
+                userInput.focus();
+            }
+            scrollChat();
+        }
+
+        function appendMessage(role, text) {
+            const div = document.createElement('div');
+            div.className = `message ${role}`;
+            div.textContent = text;
+            chatMessages.appendChild(div);
+            scrollChat();
+        }
+
+        async function loadHistory() {
+            try {
+                const res = await fetch(`/chat-history/${session_id}/`);
+                const data = await res.json();
+                if (data.length > 0) {
+                    chatMessages.innerHTML = '';
+                    data.forEach(msg => appendMessage(msg.role, msg.message));
+                }
+            } catch {}
+        }
+
+        loadHistory();
+    </script>
+</body>
+</html>
